@@ -78,14 +78,18 @@ pub enum Statement {
 
 impl Statement {
     /// Returns a dummy statement made from an empty block `{}`.
-    pub fn dummy(span: Span, id: NodeID) -> Self {
-        Self::Block(Block { statements: Vec::new(), span, id })
+    pub fn dummy() -> Self {
+        Self::Block(Block { statements: Vec::new(), span: Default::default(), id: Default::default() })
     }
 
     pub(crate) fn semicolon(&self) -> &'static str {
         use Statement::*;
 
         if matches!(self, Block(..) | Conditional(..) | Iteration(..)) { "" } else { ";" }
+    }
+
+    pub fn is_empty(self: &Statement) -> bool {
+        matches!(self, Statement::Block(block) if block.statements.is_empty())
     }
 }
 

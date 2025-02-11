@@ -58,17 +58,17 @@ mod eliminate_program;
 pub mod dead_code_eliminator;
 pub use dead_code_eliminator::*;
 
-use crate::Pass;
+use crate::{Pass, SymbolTable, TypeTable};
 
-use leo_ast::{Ast, NodeBuilder, ProgramReconstructor};
+use leo_ast::{Ast, ProgramReconstructor as _};
 use leo_errors::Result;
 
 impl<'a> Pass for DeadCodeEliminator<'a> {
-    type Input = (Ast, &'a NodeBuilder);
+    type Input = (Ast, &'a SymbolTable, &'a TypeTable);
     type Output = Result<Ast>;
 
-    fn do_pass((ast, node_builder): Self::Input) -> Self::Output {
-        let mut reconstructor = DeadCodeEliminator::new(node_builder);
+    fn do_pass((ast, symbol_table, type_table): Self::Input) -> Self::Output {
+        let mut reconstructor = DeadCodeEliminator::new(symbol_table, type_table);
         let program = reconstructor.reconstruct_program(ast.into_repr());
 
         Ok(Ast::new(program))

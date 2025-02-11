@@ -198,22 +198,20 @@ impl StatementReconstructor for Flattener<'_> {
         match (assign.place, &value) {
             (Expression::Identifier(identifier), _) => (self.simple_assign_statement(identifier, value), statements),
             (Expression::Tuple(tuple), expression) => {
-                let output_type = match &self.type_table.get(&expression.id()) {
-                    Some(Type::Tuple(tuple_type)) => tuple_type.clone(),
-                    _ => unreachable!("Type checking guarantees that the output type is a tuple."),
+                let Some(Type::Tuple(tuple_type)) = self.type_table.get(&expression.id()) else {
+                    panic!("Type checking guarantees that the output type is a tuple.");
                 };
 
-                tuple.elements.iter().zip_eq(output_type.elements().iter()).for_each(|(identifier, type_)| {
-                    let identifier = match identifier {
-                        Expression::Identifier(identifier) => identifier,
-                        _ => unreachable!("Type checking guarantees that a tuple element on the lhs is an identifier."),
+                tuple.elements.iter().zip_eq(tuple_type.elements().iter()).for_each(|(identifier, type_)| {
+                    let Expression::Identifier(identifier) = identifier else {
+                        panic!("Type checking guarantees that a tuple element on the lhs is an identifier.");
                     };
                     // Add the type of each identifier to the type table.
                     self.type_table.insert(identifier.id, type_.clone());
                 });
 
                 // Set the type of the tuple expression.
-                self.type_table.insert(tuple.id, Type::Tuple(output_type.clone()));
+                self.type_table.insert(tuple.id, Type::Tuple(tuple_type.clone()));
 
                 (
                     Statement::Assign(Box::new(AssignStatement {
@@ -225,7 +223,7 @@ impl StatementReconstructor for Flattener<'_> {
                     statements,
                 )
             }
-            _ => unreachable!("`AssignStatement`s can only have `Identifier`s or `Tuple`s on the left hand side."),
+            _ => panic!("`AssignStatement`s can only have `Identifier`s or `Tuple`s on the left hand side."),
         }
     }
 
@@ -255,7 +253,7 @@ impl StatementReconstructor for Flattener<'_> {
             let otherwise_block = match conditional.otherwise {
                 Some(statement) => match *statement {
                     Statement::Block(block) => self.reconstruct_block(block).0,
-                    _ => unreachable!("SSA guarantees that the `otherwise` is always a `Block`"),
+                    _ => panic!("SSA guarantees that the `otherwise` is always a `Block`"),
                 },
                 None => Block { span: Default::default(), statements: Vec::new(), id: self.node_builder.next_id() },
             };
@@ -316,28 +314,28 @@ impl StatementReconstructor for Flattener<'_> {
             self.condition_stack.push(Guard::Unconstructed(not_place));
 
             // Reconstruct the otherwise-block and accumulate it constituent statements.
-            match *statement {
-                Statement::Block(block) => statements.extend(self.reconstruct_block(block).0.statements),
-                _ => unreachable!("SSA guarantees that the `otherwise` is always a `Block`"),
-            }
+            let Statement::Block(block) = *statement else {
+                panic!("SSA guarantees that the `otherwise` is always a `Block`");
+            };
+            statements.extend(self.reconstruct_block(block).0.statements);
 
             // Remove the negated condition from the condition stack.
             self.condition_stack.pop();
         };
 
-        (Statement::dummy(Default::default(), self.node_builder.next_id()), statements)
+        (Statement::dummy(), statements)
     }
 
     fn reconstruct_console(&mut self, _: ConsoleStatement) -> (Statement, Self::AdditionalOutput) {
-        unreachable!("`ConsoleStatement`s should not be in the AST at this phase of compilation.")
+        panic!("`ConsoleStatement`s should not be in the AST at this phase of compilation.")
     }
 
     fn reconstruct_definition(&mut self, _definition: DefinitionStatement) -> (Statement, Self::AdditionalOutput) {
-        unreachable!("`DefinitionStatement`s should not exist in the AST at this phase of compilation.")
+        panic!("`DefinitionStatement`s should not exist in the AST at this phase of compilation.")
     }
 
     fn reconstruct_iteration(&mut self, _input: IterationStatement) -> (Statement, Self::AdditionalOutput) {
-        unreachable!("`IterationStatement`s should not be in the AST at this phase of compilation.");
+        panic!("`IterationStatement`s should not be in the AST at this phase of compilation.");
     }
 
     /// Transforms a return statement into an empty block statement.
@@ -356,9 +354,9 @@ impl StatementReconstructor for Flattener<'_> {
             Expression::Unit(_) | Expression::Identifier(_) | Expression::Access(_) => {
                 self.returns.push((return_guard, input))
             }
-            _ => unreachable!("SSA guarantees that the expression is always an identifier or unit expression."),
+            _ => panic!("SSA guarantees that the expression is always an identifier or unit expression."),
         };
 
-        (Statement::dummy(Default::default(), self.node_builder.next_id()), statements.unwrap_or_default())
+        (Statement::dummy(), statements.unwrap_or_default())
     }
 }

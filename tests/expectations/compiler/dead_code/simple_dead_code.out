@@ -1,0 +1,13 @@
+namespace = "Compile"
+expectation = "Pass"
+outputs = [[{ compile = [{ initial_ast = "b07d64183fdfd3d47e229631e5a0442d4095fb70199486440fe3001037e1c130", unrolled_ast = "b07d64183fdfd3d47e229631e5a0442d4095fb70199486440fe3001037e1c130", ssa_ast = "16138f33be0095ccab525f0981ee81d9b2bf57e4067b857bd8294cabf0771a3a", flattened_ast = "c0b2846c7c30ea450a7a008d12716208fb9454a3494f7abaf26b805acd390be1", destructured_ast = "0a9139e4146255270be900965405d7bee26896d698a856a2907f01759ab3e518", inlined_ast = "0a9139e4146255270be900965405d7bee26896d698a856a2907f01759ab3e518", dce_ast = "45675f411dcb9d3e3514bd39f5d7a13de31a283e4bec79c58d06055c7b9da62d", bytecode = """
+program test.aleo;
+
+function main:
+    input r0 as field.public;
+    input r1 as field.private;
+    is.eq r1 0field into r2;
+    div r0 r1 into r3;
+    ternary r2 r0 r3 into r4;
+    output r4 as field.private;
+""", errors = "", warnings = "" }] }]]
