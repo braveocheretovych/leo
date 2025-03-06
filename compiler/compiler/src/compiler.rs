@@ -307,9 +307,9 @@ impl<'a, N: Network> Compiler<'a, N> {
     }
 
     /// Runs the dead code elimination pass.
-    pub fn dead_code_elimination_pass(&mut self, symbol_table: &SymbolTable) -> Result<()> {
+    pub fn dead_code_elimination_pass(&mut self) -> Result<()> {
         if self.compiler_options.build.dce_enabled {
-            self.ast = DeadCodeEliminator::do_pass((std::mem::take(&mut self.ast), symbol_table, &self.type_table))?;
+            self.ast = DeadCodeEliminator::do_pass((std::mem::take(&mut self.ast),))?;
         }
 
         if self.compiler_options.output.dce_ast {
@@ -347,7 +347,7 @@ impl<'a, N: Network> Compiler<'a, N> {
 
         self.function_inlining_pass(&call_graph)?;
 
-        self.dead_code_elimination_pass(&st)?;
+        self.dead_code_elimination_pass()?;
 
         Ok((st, struct_graph, call_graph))
     }

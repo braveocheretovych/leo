@@ -271,7 +271,7 @@ pub fn compile_and_process<'a>(parsed: &'a mut Compiler<'a, CurrentNetwork>) -> 
 
     parsed.function_inlining_pass(&call_graph)?;
 
-    parsed.dead_code_elimination_pass(&st)?;
+    parsed.dead_code_elimination_pass()?;
 
     // Compile Leo program to bytecode.
     let bytecode = parsed.code_generation_pass(&st, &struct_graph, &call_graph)?;

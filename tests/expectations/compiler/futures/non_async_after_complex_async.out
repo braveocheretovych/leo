@@ -36,7 +36,7 @@ finalize mid:
 
 function dummy:
 """, errors = "", warnings = "" },
-    { initial_ast = "5df535c99668c958f5649f0e5d24ae951023b165941ded5e9df3665a1c4bdd7d", unrolled_ast = "a57c050d190c7736d66bf8b619c9343eadee054fb702d2d181679988582dd1a7", ssa_ast = "ebdcdfb1fd290cd8ba985454f66ea78e790a9d243932089daf8571b86d5872b8", flattened_ast = "314f436e8781da28062a91360dbea5c8df940533b00e8889dffffbe21596c7bb", destructured_ast = "e53019dcae637e89bcef1cc7761927a0b3f9c87c9ab794a4f3aac363b0626d2b", inlined_ast = "2274a011c8e3bbd84092ff770e19ed3954a3c5c5417a4adb441cf90d7bd3406f", dce_ast = "6cc50a39639ba11be9d1ca1d65c9eb3d08a188ea1b993b4eaedec15a2c1ef6d9", bytecode = """
+    { initial_ast = "870761a6cb2ee9dc599c4602dc3fa5bfdcae20864b1ddba11c04edb768c19c28", unrolled_ast = "f6958f24b3e3ecc12ebe8e62cc272e557bc2e53c08af7123cfba3df44d174215", ssa_ast = "7dca8807e4a41bd236a672c5897d72e6f42cd1f7f3813dc55c1bad95c1ffe2f2", flattened_ast = "d7d861bda08b1e265d66113138a9d48a2e31b4a201307b00debf7575dda90ef6", destructured_ast = "1469443b0349652ca2b2ae794e30869625eb9f38f531597fbc495d18cce6d9b9", inlined_ast = "05d42c30711699f08b8a9f75f79b3f8c08c5f915def3cf58b06e6feeaf3aef92", dce_ast = "9bb67c8e4cbb56dd3858a5d68b253ca9aa3e9306818936b1e2a22892413b7320", bytecode = """
 import inner.aleo;
 import mid.aleo;
 program outer.aleo;
@@ -45,6 +45,7 @@ function outer:
     input r0 as u32.private;
     call mid.aleo/mid 0u32 into r1;
     call mid.aleo/mid 1u32 into r2;
+    call mid.aleo/dummy;
     async outer r1 r2 into r3;
     output r3 as outer.aleo/outer.future;
 

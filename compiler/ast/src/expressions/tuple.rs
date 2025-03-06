@@ -34,11 +34,7 @@ pub struct TupleExpression {
 
 impl fmt::Display for TupleExpression {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.elements.len() == 1 {
-            write!(f, "({},)", self.elements[0])
-        } else {
-            write!(f, "({})", self.elements.iter().join(","))
-        }
+        write!(f, "({})", self.elements.iter().format(", "))
     }
 }
 

@@ -18,7 +18,7 @@ use crate::DeadCodeEliminator;
 
 use leo_ast::{Expression, ExpressionReconstructor, Identifier};
 
-impl ExpressionReconstructor for DeadCodeEliminator<'_> {
+impl ExpressionReconstructor for DeadCodeEliminator {
     type AdditionalOutput = ();
 
     // Use and reconstruct an identifier.

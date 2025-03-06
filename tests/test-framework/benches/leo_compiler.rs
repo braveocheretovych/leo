@@ -285,7 +285,7 @@ impl Sample {
             compiler.destructuring_pass().expect("failed to run destructurer pass");
             compiler.function_inlining_pass(&call_graph).expect("failed to run inliner pass");
             let start = Instant::now();
-            let out = compiler.dead_code_elimination_pass(&symbol_table);
+            let out = compiler.dead_code_elimination_pass();
             let time = start.elapsed();
             out.expect("failed to run dce pass");
             time
@@ -302,7 +302,7 @@ impl Sample {
             compiler.flattening_pass(&symbol_table).expect("failed to run flattener pass");
             compiler.destructuring_pass().expect("failed to run destructurer pass");
             compiler.function_inlining_pass(&call_graph).expect("failed to run inliner pass");
-            compiler.dead_code_elimination_pass(&symbol_table).expect("failed to run dce pass");
+            compiler.dead_code_elimination_pass().expect("failed to run dce pass");
             let start = Instant::now();
             let out = compiler.code_generation_pass(&symbol_table, &struct_graph, &call_graph);
             let time = start.elapsed();
@@ -324,7 +324,7 @@ impl Sample {
             compiler.flattening_pass(&symbol_table).expect("failed to run flattening pass");
             compiler.destructuring_pass().expect("failed to run destructuring pass");
             compiler.function_inlining_pass(&call_graph).expect("failed to run function inlining pass");
-            compiler.dead_code_elimination_pass(&symbol_table).expect("failed to run dce pass");
+            compiler.dead_code_elimination_pass().expect("failed to run dce pass");
             compiler
                 .code_generation_pass(&symbol_table, &struct_graph, &call_graph)
                 .expect("failed to run codegen pass");
