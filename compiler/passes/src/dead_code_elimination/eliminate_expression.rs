@@ -26,4 +26,22 @@ impl ExpressionReconstructor for DeadCodeEliminator {
         self.used_variables.insert(input.name);
         (Expression::Identifier(input), Default::default())
     }
+
+    // We need to make sure we hit identifiers, so do our own traversal
+    // rather than relying on the default.
+    fn reconstruct_struct_init(
+        &mut self,
+        mut input: leo_ast::StructExpression,
+    ) -> (Expression, Self::AdditionalOutput) {
+        for member in input.members.iter_mut() {
+            if let Some(expr) = std::mem::take(&mut member.expression) {
+                member.expression = Some(self.reconstruct_expression(expr).0);
+            } else {
+                // We're not actually going to modify it.
+                self.reconstruct_identifier(member.identifier);
+            }
+        }
+
+        (Expression::Struct(input), Default::default())
+    }
 }

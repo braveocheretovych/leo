@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-use leo_ast::{AccessExpression, Expression};
+use leo_ast::{AccessExpression, BinaryOperation, Expression, UnaryOperation};
 use leo_span::{Symbol, sym};
 
 use indexmap::IndexSet;
@@ -49,7 +49,13 @@ impl DeadCodeEliminator {
             Access(AccessExpression::Member(mem)) => Self::side_effect_free(&mem.inner),
             Access(AccessExpression::Tuple(tuple)) => Self::side_effect_free(&tuple.tuple),
             Array(array) => array.elements.iter().all(Self::side_effect_free),
-            Binary(bin) => Self::side_effect_free(&bin.left) && Self::side_effect_free(&bin.right),
+            Binary(bin) => {
+                use BinaryOperation::*;
+                // These operations may halt, and so aren't side effect free.
+                !matches!(bin.op, Add | Div | Mod | Mul | Pow | Shl | Shr)
+                    && Self::side_effect_free(&bin.left)
+                    && Self::side_effect_free(&bin.right)
+            }
             Call(..) => {
                 // Since calls may halt, be conservative and don't consider any call side effect free.
                 false
@@ -62,7 +68,11 @@ impl DeadCodeEliminator {
                 [&*tern.condition, &*tern.if_true, &*tern.if_false].into_iter().all(Self::side_effect_free)
             }
             Tuple(tuple) => tuple.elements.iter().all(Self::side_effect_free),
-            Unary(un) => Self::side_effect_free(&un.receiver),
+            Unary(un) => {
+                use UnaryOperation::*;
+                // These operations may halt, and so aren't side effect free.
+                !matches!(un.op, Abs | Inverse | SquareRoot) && Self::side_effect_free(&un.receiver)
+            }
             Err(_) => false,
             Identifier(_) | Literal(_) | Locator(_) | Unit(_) => true,
         }
